@@ -80,7 +80,7 @@ func (t *TrialRegistryChaincode) addEntry(stub *shim.ChaincodeStub, args []strin
 
 	trialDescriptionHash = args[0]
     for i := 1; i < len(args); i++ {
-        clinicPubKey += "\n" + args[i]
+        clinicPubKey += "," + args[i]
     }
 
 	err = stub.PutState(trialDescriptionHash, []byte(clinicPubKey))
