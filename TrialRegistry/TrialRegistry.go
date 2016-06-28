@@ -79,15 +79,30 @@ func (t *TrialRegistryChaincode) Invoke(stub *shim.ChaincodeStub, function strin
 // addEntry is used to store any key/value pair in the ledger
 func (t *TrialRegistryChaincode) addEntry(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
 	
-	entry := TrialRegistryHashMap{trialDescriptionHash: args[0], clinicPubKey: args[1:]}
-
-	var err error
 	fmt.Println("running addEntry()")
 
 	if len(args) < 2 {
 		return nil, errors.New("addEntry operation must include two arguments, the trialDescriptionHash and clinicPubKey")
 	}
 
+	entry := TrialRegistryHashMap{trialDescriptionHash: args[0], clinicPubKey: args[1:]}
+
+	var err error
+	var trials []*TrialRegistryHashMap
+	
+	//check if key already exists, update the old value if it exists
+	for _, trialVal := range trials {
+		if trialVal.trialDescriptionHash == entry.trialDescriptionHash {
+			trialVal.clinicPubKey = append(entry.clinicPubKey)
+			clinicPubKeyByte,_ := json.Marshal(trialVal.clinicPubKey)
+			err = stub.PutState(trialVal.trialDescriptionHash, clinicPubKeyByte)
+			if err != nil {
+				fmt.Printf("Error putting state %s", err)
+				return nil, fmt.Errorf("put operation failed. Error updating state: %s", err)
+			}
+		}
+	}
+	
 	clinicPubKeyByte,_ := json.Marshal(entry.clinicPubKey)
 	err = stub.PutState(entry.trialDescriptionHash, clinicPubKeyByte)
 	if err != nil {
@@ -99,21 +114,32 @@ func (t *TrialRegistryChaincode) addEntry(stub *shim.ChaincodeStub, args []strin
 
 // removeEntry is used to store any key/value pair in the ledger
 func (t *TrialRegistryChaincode) removeEntry(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
-	var trialDescriptionHash string
 	var err error
+	//var trials []*TrialRegistryHashMap
 	fmt.Println("running removeEntry()")
 
 	if len(args) < 1 {
 		return nil, errors.New("removeEntry operation must include one argument, the trialDescriptionHash")
 	}
 
-	trialDescriptionHash = args[0]
+	trialHash := args[0]
 
-	err = stub.DelState(trialDescriptionHash)
+	//for _, trialVal := range trials {
+	//	if trialVal.trialDescriptionHash == trialHash {
+	//		trialVal.clinicPubKey = append(entry.clinicPubKey)
+	//		clinicPubKeyByte,_ := json.Marshal(trialVal.clinicPubKey)
+	//		err = stub.PutState(trialVal.trialDescriptionHash, clinicPubKeyByte)
+	//		if err != nil {
+	//			fmt.Printf("Error putting state %s", err)
+	//			return nil, fmt.Errorf("put operation failed. Error updating state: %s", err)
+	//		}
+	//	}
+	//}
+	err = stub.DelState(trialHash)
 	if err != nil {
 		return nil, fmt.Errorf("removeEntry operation failed. Error updating state: %s", err)
-	}
-	return nil, nil
+	} 
+	return nil, fmt.Errorf("No clinics currently doing this trial %s", err)
 }
 
 // Query is our entry point for queries
