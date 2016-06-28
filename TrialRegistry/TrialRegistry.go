@@ -30,10 +30,13 @@ import (
 type TrialRegistryChaincode struct {
 }
 
+// TrialRegistryHashMap implementation
 type TrialRegistryHashMap struct {
 	trialDescriptionHash string
 	clinicPubKey []string
 }
+
+var trials []*TrialRegistryHashMap
 
 // ============================================================================================================================
 // Main
@@ -88,12 +91,13 @@ func (t *TrialRegistryChaincode) addEntry(stub *shim.ChaincodeStub, args []strin
 	entry := TrialRegistryHashMap{trialDescriptionHash: args[0], clinicPubKey: args[1:]}
 
 	var err error
-	var trials []*TrialRegistryHashMap
 	
 	//check if key already exists, update the old value if it exists
 	for _, trialVal := range trials {
 		if trialVal.trialDescriptionHash == entry.trialDescriptionHash {
-			trialVal.clinicPubKey = append(entry.clinicPubKey)
+			for _, clinic := range entry.clinicPubKey {
+				trialVal.clinicPubKey = append(trialVal.clinicPubKey, clinic)
+			}
 			clinicPubKeyByte,_ := json.Marshal(trialVal.clinicPubKey)
 			err = stub.PutState(trialVal.trialDescriptionHash, clinicPubKeyByte)
 			if err != nil {
