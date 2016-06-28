@@ -17,14 +17,22 @@ limitations under the License.
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
+//var trialHashMap map[string]string
+
 // TrialRegistryChaincode implementation
 type TrialRegistryChaincode struct {
+}
+
+type TrialRegistryHashMap struct {
+	trialDescriptionHash string
+	clinicPubKey []string
 }
 
 // ============================================================================================================================
@@ -42,6 +50,7 @@ func (t *TrialRegistryChaincode) Init(stub *shim.ChaincodeStub, function string,
 	if len(args) != 1 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 1")
 	}
+
 	err := stub.PutState("trialDescriptionHash", []byte(args[0]))
 	if err != nil {
 		return nil, err
@@ -69,7 +78,9 @@ func (t *TrialRegistryChaincode) Invoke(stub *shim.ChaincodeStub, function strin
 
 // addEntry is used to store any key/value pair in the ledger
 func (t *TrialRegistryChaincode) addEntry(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
-	var trialDescriptionHash, clinicPubKey  string
+	
+	entry := TrialRegistryHashMap{trialDescriptionHash: args[0], clinicPubKey: args[1:]}
+
 	var err error
 	fmt.Println("running addEntry()")
 
@@ -77,9 +88,8 @@ func (t *TrialRegistryChaincode) addEntry(stub *shim.ChaincodeStub, args []strin
 		return nil, errors.New("addEntry operation must include two arguments, the trialDescriptionHash and clinicPubKey")
 	}
 
-	trialDescriptionHash = args[0]
-	clinicPubKey = args[1]
-	err = stub.PutState(trialDescriptionHash, []byte(clinicPubKey))
+	clinicPubKeyByte,_ := json.Marshal(entry.clinicPubKey)
+	err = stub.PutState(entry.trialDescriptionHash, clinicPubKeyByte)
 	if err != nil {
 		fmt.Printf("Error putting state %s", err)
 		return nil, fmt.Errorf("put operation failed. Error updating state: %s", err)
