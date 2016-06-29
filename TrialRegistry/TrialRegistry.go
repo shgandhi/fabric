@@ -178,4 +178,4 @@ func (t *TrialRegistryChaincode) getTrialClinics(stub *shim.ChaincodeStub, args 
 	return clinicPubKey, nil
 }
 
-func (t *TrialRegistryChaincode) get
+//func (t *TrialRegistryChaincode) get
