@@ -140,6 +140,11 @@ func (t *TrialRegistryChaincode) removeEntry(stub *shim.ChaincodeStub, args []st
 	for i := range trials {
 		if trials[i].trialDescriptionHash == trialHash {
 			trials = append(trials[:i], trials[(i+1):]...)
+			err = stub.DelState(trialHash)
+			if err != nil {
+				return nil, fmt.Errorf("removeEntry operation failed. Error updating state: %s", err)
+			} 
+			return nil, nil
 		}
 	}
 	err = stub.DelState(trialHash)
