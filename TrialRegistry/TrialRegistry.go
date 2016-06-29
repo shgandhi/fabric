@@ -89,7 +89,8 @@ func (t *TrialRegistryChaincode) addEntry(stub *shim.ChaincodeStub, args []strin
 	}
 
 	entry := TrialRegistryHashMap{trialDescriptionHash: args[0], clinicPubKey: args[1:]}
-
+	trials = append(trials, TrialRegistryHashMap{trialDescriptionHash: args[0], clinicPubKey: args[1:]})
+	
 	var err error
 	
 	//check if key already exists, update the old value if it exists
