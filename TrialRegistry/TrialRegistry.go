@@ -93,11 +93,19 @@ func (t *TrialRegistryChaincode) addEntry(stub *shim.ChaincodeStub, args []strin
 	
 	var err error
 	
-	//check if key already exists, update the old value if it exists
+	//check if key already exists, update the old value
 	for i := range trials {
 		if trials[i].trialDescriptionHash == entry.trialDescriptionHash {
-			for _, clinic := range entry.clinicPubKey {
-				trials[i].clinicPubKey = append(trials[i].clinicPubKey, clinic)
+			for j := range entry.clinicPubKey {
+				isClinicRepeat := 0
+				for k := range trials[i].clinicPubKey {
+					if entry.clinicPubKey[j] == trials[i].clinicPubKey[k] {
+						isClinicRepeat = 1
+					}
+				}
+				if isClinicRepeat == 0 {
+					trials[i].clinicPubKey = append(trials[i].clinicPubKey, entry.clinicPubKey[j])
+				}
 			}
 			clinicPubKeyByte,_ := json.Marshal(trials[i].clinicPubKey)
 			err = stub.PutState(trials[i].trialDescriptionHash, clinicPubKeyByte)
