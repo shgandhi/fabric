@@ -126,29 +126,23 @@ func (t *TrialRegistryChaincode) addEntry(stub *shim.ChaincodeStub, args []strin
 	return nil, nil
 }
 
-// removeEntry is used to store any key/value pair in the ledger
+// removeEntry is used to remove any key/value pair in the ledger
 func (t *TrialRegistryChaincode) removeEntry(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
 	var err error
 	fmt.Println("running removeEntry()")
 
-	if len(args) < 1 {
+	if len(args) != 1 {
 		return nil, errors.New("removeEntry operation must include one argument, the trialDescriptionHash")
 	}
 
-	trialDescriptionHash := args[0]
+	trialHash := args[0]
 
-	//for _, trialVal := range trials {
-	//	if trialVal.trialDescriptionHash == trialHash {
-	//		trialVal.clinicPubKey = append(entry.clinicPubKey)
-	//		clinicPubKeyByte,_ := json.Marshal(trialVal.clinicPubKey)
-	//		err = stub.PutState(trialVal.trialDescriptionHash, clinicPubKeyByte)
-	//		if err != nil {
-	//			fmt.Printf("Error putting state %s", err)
-	//			return nil, fmt.Errorf("put operation failed. Error updating state: %s", err)
-	//		}
-	//	}
-	//}
-	err = stub.DelState(trialDescriptionHash)
+	for i := range trials {
+		if trials[i].trialDescriptionHash == trialHash {
+			trials = append(trials[:i], trials[(i+1):]...)
+		}
+	}
+	err = stub.DelState(trialHash)
 	if err != nil {
 		return nil, fmt.Errorf("removeEntry operation failed. Error updating state: %s", err)
 	} 
