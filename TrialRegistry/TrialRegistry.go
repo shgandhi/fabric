@@ -89,14 +89,14 @@ func (t *TrialRegistryChaincode) addEntry(stub *shim.ChaincodeStub, args []strin
 	}
 
 	entry := TrialRegistryHashMap{trialDescriptionHash: args[0], clinicPubKey: args[1:]}
-	trials = append(trials, TrialRegistryHashMap{trialDescriptionHash: args[0], clinicPubKey: args[1:]})
+	trials = append(trials, entry)
 	
 	var err error
 	
 	//check if key already exists, update the old value if it exists
 	for i := range trials {
 		if trials[i].trialDescriptionHash == entry.trialDescriptionHash {
-			for _, clinic := range (entry.clinicPubKey) {
+			for _, clinic := range entry.clinicPubKey {
 				trials[i].clinicPubKey = append(trials[i].clinicPubKey, clinic)
 			}
 			clinicPubKeyByte,_ := json.Marshal(trials[i].clinicPubKey)
@@ -105,6 +105,7 @@ func (t *TrialRegistryChaincode) addEntry(stub *shim.ChaincodeStub, args []strin
 				fmt.Printf("Error putting state %s", err)
 				return nil, fmt.Errorf("put operation failed. Error updating state: %s", err)
 			}
+			return nil, nil
 		}
 	}
 	
