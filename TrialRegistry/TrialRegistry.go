@@ -129,14 +129,13 @@ func (t *TrialRegistryChaincode) addEntry(stub *shim.ChaincodeStub, args []strin
 // removeEntry is used to store any key/value pair in the ledger
 func (t *TrialRegistryChaincode) removeEntry(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
 	var err error
-	//var trials []*TrialRegistryHashMap
 	fmt.Println("running removeEntry()")
 
 	if len(args) < 1 {
 		return nil, errors.New("removeEntry operation must include one argument, the trialDescriptionHash")
 	}
 
-	trialHash := args[0]
+	trialDescriptionHash := args[0]
 
 	//for _, trialVal := range trials {
 	//	if trialVal.trialDescriptionHash == trialHash {
@@ -149,11 +148,11 @@ func (t *TrialRegistryChaincode) removeEntry(stub *shim.ChaincodeStub, args []st
 	//		}
 	//	}
 	//}
-	err = stub.DelState(trialHash)
+	err = stub.DelState(trialDescriptionHash)
 	if err != nil {
 		return nil, fmt.Errorf("removeEntry operation failed. Error updating state: %s", err)
 	} 
-	return nil, fmt.Errorf("No clinics currently doing this trial %s", err)
+	return nil, nil
 }
 
 // Query is our entry point for queries
