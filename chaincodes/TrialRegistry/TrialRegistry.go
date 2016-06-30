@@ -170,4 +170,28 @@ func (t *TrialRegistryChaincode) getTrialClinics(stub *shim.ChaincodeStub, args 
 	return clinicPubKey, nil
 }
 
+// getTrials is used to get the list of all the current trials
+func (t *TrialRegistryChaincode) getTrials(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
+	trialsIter, err := stub.RangeQueryState("", "")
+	if err != nil {
+		return nil, fmt.Errorf("getTrials operation failed. Error accessing state: %s", err)
+	}
+	defer trialsIter.Close()
+
+	var trials []string
+	for trialsIter.HasNext() {
+		trial, _, iterErr := trialsIter.Next()
+		if iterErr != nil {
+			return nil, fmt.Errorf("getTrials operation failed. Error accessing state: %s", err)
+		}
+		trials = append(trials, trial)
+	}
+
+	jsonKeys, err := json.Marshal(trials)
+	if err != nil {
+		return nil, fmt.Errorf("getTrials operation failed. Error marshaling JSON: %s", err)
+	}
+
+	return jsonKeys, nil
+}
 //func (t *TrialRegistryChaincode) get
