@@ -148,7 +148,9 @@ func (t *TrialRegistryChaincode) Query(stub *shim.ChaincodeStub, function string
 	fmt.Println("query is running " + function)
 	// Handle different functions
 	if function == "getTrialClinics" {											//read a variable					
-		return t.getTrialClinics(stub, args);
+		return t.getTrialClinics(stub, args)
+	} else if function == "getTrials" {
+		return t.getTrials(stub, args)
 	}
 	fmt.Println("query did not find func: " + function)						//error
 	return nil, errors.New("Received unknown function query")
