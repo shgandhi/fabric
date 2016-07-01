@@ -1,0 +1,5 @@
+
+message Init {
+        string ownerPubKey = 1;
+        string recordHash = 2;
+}

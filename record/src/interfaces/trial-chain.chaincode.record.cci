@@ -1,0 +1,28 @@
+
+message Trial {
+        string pubKey = 1;
+}
+
+message Message {
+        string hash = 1;
+}
+
+message TrialsResult {
+        repeated Trial trials = 1;
+}
+
+message RecordResult {
+        string hash = 1;
+        string data = 2;
+}
+
+transactions {
+        void AuthorizeTrial(Trial) = 1;
+        void DeauthorizeTrial(Trial) = 2;
+        void Notify(Message) = 3;
+}
+
+queries {
+        RecordResult GetRecord(void) = 1;
+        TrialsResult GetAuthorizedTrials(void) = 2;
+}
