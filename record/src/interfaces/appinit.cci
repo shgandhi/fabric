@@ -1,5 +1,5 @@
 
 message Init {
-        string ownerPubKey = 1;
-        string recordHash = 2;
+        bytes ownerPubKey = 1;
+        bytes recordHash = 2;
 }

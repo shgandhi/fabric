@@ -20,6 +20,11 @@ package main
 import (
 	"errors"
 	"fmt"
+	"bytes"
+	
+	"hyperledger/ccs"
+	"hyperledger/cci/appinit"
+	"hyperledger/cci/trial-chain/chaincode/record"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -29,8 +34,12 @@ const (
 	owner = "owner"
 	recordHash = "recordHash"
 	authorizedTrials = "authorizedTrials"
-	notifications = "notifications"
+	messages = "messages"
 )
+
+
+type Record struct {
+}
 
 // Called to initialize the chaincode
 func (t *Record) Init(stub *shim.ChaincodeStub, param *appinit.Init) error {
@@ -49,15 +58,14 @@ func (t *Record) Init(stub *shim.ChaincodeStub, param *appinit.Init) error {
 	}
 
 	//initialize authorized trials with empty array
-	var ts []string
-	err = stub.PutState(authorizedTrials, ts)
+	var list = &record.List{}
+	err = t.PutState(stub, authorizedTrials, list)
 	if err != nil {
 		return err
 	}
 
-	//initialize notifications with empty array
-	var ns []string
-	err = stub.PutState(notifications, ns)
+	//similarly, initialize messages
+	err = t.PutState(stub, messages, list)
 	if err != nil {
 		return err
 	}
@@ -65,62 +73,48 @@ func (t *Record) Init(stub *shim.ChaincodeStub, param *appinit.Init) error {
 	return nil
 }
 
-func (t *Record) AuthorizeTrial(stub *shim.ChaincodeStub, param *record.Trial) error {
-
-	var err error
-
-	fmt.Printf("Authorizing trial: %s", param.PubKey)
-	t.AddItem(stub, authorizedTrials, param.PubKey)
+func (t *Record) AuthorizeTrial(stub *shim.ChaincodeStub, item *record.Item) error {
+	fmt.Printf("Authorizing trial: %s", item.Data)
+	return t.AddItem(stub, authorizedTrials, item)
 }
 
-func (t *Record) RevokeAuthorization(stub *shim.ChaincodeStub, param *record.Trial) error {
-
-	var err error
-
-	fmt.Printf("Revoking authorization from trial: %s", param.PubKey)
-	t.RemoveItem(stub, authoaizedTrials, param.PubKey)
-	
-	return nil
+func (t *Record) RevokeAuthorization(stub *shim.ChaincodeStub, item *record.Item) error {
+	fmt.Printf("Revoking authorization from trial: %s", item.Data)
+	return t.RemoveItem(stub, authorizedTrials, item)
 }
 
-func (t *Record) Notify(stub *shim.ChaincodeStub, param *record.Message) error {
+func (t *Record) SendMessage(stub *shim.ChaincodeStub, item *record.Item) error {
+	fmt.Printf("Recording message: %s", item.Data)
+	return t.AddItem(stub, messages, item)
+}
 
-	var err error
-
-	fmt.Printf("Recording notification: %s", param.Hash)
-	t.AddItem(stub, notifications, param.Hash)
-
-	return nil
+func (t *Record) DeleteMessage(stub *shim.ChaincodeStub, item *record.Item) error {
+	fmt.Printf("Revoking authorization from trial: %s", item.Data)
+	return t.RemoveItem(stub, messages, item)
 }
 
 func (t *Record) GetRecord(stub *shim.ChaincodeStub) error {
 
-	var err error
-
-	data, err = t.GetState(stub, authorizedTrials)
+	data := &record.RecordData{}
+	err := t.GetState(stub, authorizedTrials, data)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	fmt.Printf("Query Response: %v\n", data)
-	return &record.TrialsResult{Trials: data}, nil
-
 	return nil
 }
 
-func (t *Record) GetAuthorizedTrials(stub *shim.ChaincodeStub) (*record.TrialsResult, error) {
+func (t *Record) GetAuthorizedTrials(stub *shim.ChaincodeStub) (*record.List, error) {
 
-	var err error
-
-	data, err = t.GetState(stub, authorizedTrials)
+	list := &record.List{}
+	err := t.GetState(stub, authorizedTrials, list)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Printf("Query Response: %v\n", data)
-	return &record.TrialsResult{Trials: data}, nil
-
-	return nil
+	fmt.Printf("Query Response: %v\n", list)
+	return list, nil
 }
 
 func main() {
@@ -138,17 +132,29 @@ func main() {
 
 
 //---------------Helper Functions---------------
-func (t *Record) AddItem(stub *shim.ChaincodeStub, location string, item string) error {
-	//load current items
-	data, err = stub.GetState(location)
+func (t *Record) GetState(stub *shim.ChaincodeStub, location string, data proto.Message) error {
+	raw, err := stub.GetState(location)
+	if err != nil {
+		return err
+	}
+	
+	err = proto.Unmarshal(raw, data)
+	if err != nil {
+		return err
+	}
+	if data == nil {
+		return errors.New("Data not found")
+	}
+
+	return nil
+}
+
+func (t *Record) PutState(stub *shim.ChaincodeStub, location string, pb proto.Message) error {
+	data, err := proto.Marshal(pb)
 	if err != nil {
 		return err
 	}
 
-	//append new item to list
-	data = append(data, item)
-
-	//store updated list
 	err = stub.PutState(location, data)
 	if err != nil {
 		return err
@@ -157,36 +163,41 @@ func (t *Record) AddItem(stub *shim.ChaincodeStub, location string, item string)
 	return nil
 }
 
-func (t *Record) RemoveItem(stub *shim.ChaincodeStub, location string, item string) error {
-	data, err = stub.GetState(location)
+func (t *Record) AddItem(stub *shim.ChaincodeStub, location string, item *record.Item) error {
+	//load current items
+	list := &record.List{}
+	err := t.GetState(stub, location, list)
+	if err != nil {
+		return err
+	}
+
+	//append new item to list
+	list.Items = append(list.Items, item)
+
+	//store updated list
+	err = t.PutState(stub, location, list)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (t *Record) RemoveItem(stub *shim.ChaincodeStub, location string, item *record.Item) error {
+	list := &record.List{}
+	err := t.GetState(stub, location, list)
 	if err != nil {
 		return err
 	}
 
 	//loop through trials, keeping everything but the trial being revoked
-	updated = data[0:]
-	for _, i =: range data {
-		if i != item {
-			updated = append(updated, i)
+	updated := &record.List{}
+	for _, i := range list.Items {
+		if !bytes.Equal(i.Data, item.Data) {
+			updated.Items = append(updated.Items, i)
 		}
 	}
 
 	//store updated list
-	err = stub.PutState(location, updated)
-	if err != nil {
-		return err
-	}
-}
-
-
-func (t *ChaincodeExample) GetState(stub *shim.ChaincodeStub, location string) ([]string, error) {
-	bytes, err := stub.GetState(entity)
-	if err != nil {
-		return 0, errors.New("Failed to get state")
-	}
-	if bytes == nil {
-		return 0, errors.New("Data not found")
-	}
-
-	return []string(bytes), nil
+	return t.PutState(stub, location, updated)
 }

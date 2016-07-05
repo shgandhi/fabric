@@ -1,28 +1,29 @@
 
-message Trial {
-        string pubKey = 1;
+message Item {
+  bytes data = 1;
 }
 
-message Message {
-        string hash = 1;
+message List {
+  repeated Item items = 1;
 }
 
-message TrialsResult {
-        repeated Trial trials = 1;
+message RecordData {
+  bytes hash = 1;
+  bytes data = 2;
 }
 
-message RecordResult {
-        string hash = 1;
-        string data = 2;
+message EmptyParams {
 }
 
 transactions {
-        void AuthorizeTrial(Trial) = 1;
-        void DeauthorizeTrial(Trial) = 2;
-        void Notify(Message) = 3;
+  void AuthorizeTrial(Item) = 1;
+  void DeauthorizeTrial(Item) = 2;
+  void SendMessage(Item) = 3;
+  void DeleteMessage(Item) = 4;
 }
 
 queries {
-        RecordResult GetRecord(void) = 1;
-        TrialsResult GetAuthorizedTrials(void) = 2;
+  RecordData GetRecord(EmptyParams) = 1;
+  List GetNotifications(EmptyParams) = 1;        
+  List GetAuthorizedTrials(EmptyParams) = 2;
 }
