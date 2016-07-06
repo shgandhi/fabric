@@ -93,22 +93,34 @@ func (t *Record) DeleteMessage(stub *shim.ChaincodeStub, item *record.Item) erro
 	return t.RemoveItem(stub, messages, item)
 }
 
-func (t *Record) GetRecord(stub *shim.ChaincodeStub) error {
+func (t *Record) GetRecord(stub *shim.ChaincodeStub, params *record.EmptyParams) (*record.Item, error) {
 
-	data := &record.RecordData{}
-	err := t.GetState(stub, authorizedTrials, data)
+	data := &record.Item{}
+	err := t.GetState(stub, recordHash, data)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	fmt.Printf("Query Response: %v\n", data)
-	return nil
+	return data, nil
 }
 
-func (t *Record) GetAuthorizedTrials(stub *shim.ChaincodeStub) (*record.List, error) {
+func (t *Record) GetAuthorizedTrials(stub *shim.ChaincodeStub, params *record.EmptyParams) (*record.List, error) {
 
 	list := &record.List{}
 	err := t.GetState(stub, authorizedTrials, list)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("Query Response: %v\n", list)
+	return list, nil
+}
+
+func (t *Record) GetMessages(stub *shim.ChaincodeStub, params *record.EmptyParams) (*record.List, error) {
+
+	list := &record.List{}
+	err := t.GetState(stub, messages, list)
 	if err != nil {
 		return nil, err
 	}

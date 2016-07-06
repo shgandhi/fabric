@@ -7,23 +7,18 @@ message List {
   repeated Item items = 1;
 }
 
-message RecordData {
-  bytes hash = 1;
-  bytes data = 2;
-}
-
 message EmptyParams {
 }
 
 transactions {
   void AuthorizeTrial(Item) = 1;
-  void DeauthorizeTrial(Item) = 2;
+  void RevokeAuthorization(Item) = 2;
   void SendMessage(Item) = 3;
   void DeleteMessage(Item) = 4;
 }
 
 queries {
-  RecordData GetRecord(EmptyParams) = 1;
-  List GetNotifications(EmptyParams) = 1;        
-  List GetAuthorizedTrials(EmptyParams) = 2;
+  Item GetRecord(EmptyParams) = 1;
+  List GetMessages(EmptyParams) = 2;
+  List GetAuthorizedTrials(EmptyParams) = 3;
 }
