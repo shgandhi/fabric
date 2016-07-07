@@ -1,0 +1,8 @@
+* Trial Chain
+** Introduction
+   This project is a proof-of-concept electronic health record management system.
+** Getting Started
+** API
+*** Record
+*** TrialRegistry
+** Directory Structure
