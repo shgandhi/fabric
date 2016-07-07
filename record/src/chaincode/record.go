@@ -18,7 +18,6 @@ under the License.
 package main
 
 import (
-	"errors"
 	"fmt"
 	"bytes"
 	
@@ -43,29 +42,18 @@ type Record struct {
 
 // Called to initialize the chaincode
 func (t *Record) Init(stub *shim.ChaincodeStub, param *appinit.Init) error {
-
-	var err error
-
 	fmt.Printf("Importing record %s for owner %s\n", param.RecordHash, param.OwnerPubKey)
-	err = stub.PutState(owner, param.OwnerPubKey)
+	err := stub.PutState(owner, param.OwnerPubKey)
 	if err != nil {
 		return err
 	}
 
-	err = stub.PutState(recordHash, param.RecordHash)
+	hash := &record.Item{Data: param.RecordHash}
+	data, err := proto.Marshal(hash)
 	if err != nil {
 		return err
 	}
-
-	//initialize authorized trials with empty array
-	var list = &record.List{}
-	err = t.PutState(stub, authorizedTrials, list)
-	if err != nil {
-		return err
-	}
-
-	//similarly, initialize messages
-	err = t.PutState(stub, messages, list)
+	err = stub.PutState(recordHash, data)
 	if err != nil {
 		return err
 	}
@@ -154,9 +142,6 @@ func (t *Record) GetState(stub *shim.ChaincodeStub, location string, data proto.
 	if err != nil {
 		return err
 	}
-	if data == nil {
-		return errors.New("Data not found")
-	}
 
 	return nil
 }
@@ -167,6 +152,7 @@ func (t *Record) PutState(stub *shim.ChaincodeStub, location string, pb proto.Me
 		return err
 	}
 
+	fmt.Printf("Marshalled data: %v\n", data)
 	err = stub.PutState(location, data)
 	if err != nil {
 		return err
@@ -185,6 +171,7 @@ func (t *Record) AddItem(stub *shim.ChaincodeStub, location string, item *record
 
 	//append new item to list
 	list.Items = append(list.Items, item)
+	fmt.Printf("List: %v\n", list)
 
 	//store updated list
 	err = t.PutState(stub, location, list)
