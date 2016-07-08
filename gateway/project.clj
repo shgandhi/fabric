@@ -40,6 +40,7 @@
    [:cljsbuild :builds :app :compiler :output-to]]
 
   :source-paths ["src/clj" "src/cljc"]
+  :test-paths ["spec/clj"]
   :resource-paths ["resources" "target/cljsbuild"]
 
   :minify-assets
@@ -64,35 +65,60 @@
               :source-map true
               :optimizations :none
               :pretty-print  true}}
+
+            :test
+            {:source-paths ["src/cljs" "src/cljc" "spec/cljs"]
+             :compiler {:output-to "target/test.js"
+                        :optimizations :whitespace
+                        :pretty-print true}}
+            :devcards
+            {:source-paths ["src/cljs" "src/cljc" "env/dev/cljs"]
+             :figwheel {:devcards true}
+             :compiler {:main "gateway.cards"
+                        :asset-path "js/devcards_out"
+                        :output-to "target/cljsbuild/public/js/app_devcards.js"
+                        :output-dir "target/cljsbuild/public/js/devcards_out"
+                        :source-map-timestamp true
+                        :optimizations :none
+                        :pretty-print true}}
             }
+   :test-commands {"unit" ["phantomjs" "runners/speclj" "target/test.js"]}
    }
 
+   :doo {:build "test"}
 
   :figwheel
-  {:http-server-root "public"
-   :hawk-options {:watcher :polling}
-   :server-port 3449
-   :nrepl-port 7002
-   :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"
+  {:nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"
+                      "cider.nrepl/cider-middleware"
+                      "refactor-nrepl.middleware/wrap-refactor"
                       ]
    :css-dirs ["resources/public/css"]
-   :ring-handler gateway.handler/app}
+   :ring-handler gateway.repl/http-handler
+   :server-logfile "log/figwheel.log"}
 
-
-
-  :profiles {:dev {:repl-options {:init-ns gateway.repl}
+  :profiles {:dev {:repl-options {:init-ns gateway.repl
+                                  :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
 
                    :dependencies [[ring/ring-mock "0.3.0"]
                                   [ring/ring-devel "1.5.0"]
                                   [prone "1.1.1"]
+                                  [figwheel "0.5.4-5"]
                                   [figwheel-sidecar "0.5.4-5"]
                                   [org.clojure/tools.nrepl "0.2.12"]
                                   [com.cemerick/piggieback "0.2.2-SNAPSHOT"]
+                                  [speclj "3.3.1"]
+                                  [devcards "0.2.1-7"]
                                   [pjstadig/humane-test-output "0.8.0"]
                                   ]
 
                    :source-paths ["env/dev/clj"]
                    :plugins [[lein-figwheel "0.5.4-5"]
+                             [speclj "3.3.1"]
+                             [cider/cider-nrepl "0.13.0-SNAPSHOT"]
+                             [org.clojure/tools.namespace "0.3.0-alpha2"
+                              :exclusions [org.clojure/tools.reader]]
+                             [refactor-nrepl "2.0.0-SNAPSHOT"
+                              :exclusions [org.clojure/clojure]]
                              ]
 
                    :injections [(require 'pjstadig.humane-test-output)

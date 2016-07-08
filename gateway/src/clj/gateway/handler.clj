@@ -26,11 +26,23 @@
      mount-target
      (include-js "/js/app.js")]))
 
+(def cards-page
+  (html5
+    (head)
+    [:body
+     mount-target
+     (include-js "/js/app_devcards.js")]))
+
+(def test-page
+  (html5
+    (head)
+    [:body "Test!"]))
 
 (defroutes routes
   (GET "/" [] loading-page)
   (GET "/about" [] loading-page)
-  
+  (GET "/cards" [] cards-page)
+  (GET "/test" [] test-page)  
   (resources "/")
   (not-found "Not Found"))
 

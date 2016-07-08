@@ -1,6 +1,8 @@
 (ns gateway.repl
   (:use gateway.handler
         ring.server.standalone
+        [ring.middleware.reload :refer [wrap-reload]]
+        [figwheel-sidecar.repl-api :as figwheel]
         [ring.middleware file-info file]))
 
 (defonce server (atom nil))
@@ -30,3 +32,12 @@
 (defn stop-server []
   (.stop @server)
   (reset! server nil))
+
+;; figwheel versions
+(def http-handler
+  (wrap-reload #'app))
+
+(defn run []
+  (figwheel/start-figwheel!))
+
+(def browser-repl figwheel/cljs-repl)

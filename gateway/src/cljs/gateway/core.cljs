@@ -13,7 +13,7 @@
 
 (defn about-page []
   [:div [:h2 "About gateway"]
-   [:div [:a {:href "/"} "go to the other page"]]])
+   [:div [:a {:href "/"} "go to the home page"]]])
 
 (defn current-page []
   [:div [(session/get :current-page)]])
