@@ -2,6 +2,20 @@
 ** Introduction
    This project is a proof-of-concept electronic health record management system.
 ** Getting Started
+*** Gateway
+    The gateway application is built using clojure and clojurescript with the following libraries, plugins and helpful tools:
+| [[http://leiningen.org/][leiningen]]  | Build + run managment, package manager, etc.                     |
+| [[https://github.com/ring-clojure/ring][Ring]]       | HTTP server                                                      |
+| [[https://github.com/weavejester/compojure][Compojure]]  | Lighweight routing / app framework on Ring                       |
+| [[https://github.com/reagent-project/reagent][Reagent]]    | Client framework based on React.js                               |
+| [[https://github.com/weavejester/hiccup][Hiccup]]     | Html templating / generation library                             |
+| [[https://github.com/gf3/secretary][Secretary]]  | Client side routing                                              |
+| [[https://github.com/venantius/accountant][Accountant]] | Convert links to secretary route invocations                     |
+| [[https://github.com/bhauman/lein-figwheel][Figwheel]]   | live js reloading                                                |
+| [[https://github.com/slagyr/speclj][speclj]]     | TDD library for clj and cljs                                     |
+| [[https://github.com/bhauman/devcards][devcards]]   | Interactive demo and testing tool for cljs                       |
+| [[https://github.com/clojure-emacs/cider][cider]]      | Clojure Interactive Development Environment that Rocks for Emacs |
+    
 ** API
 *** Record
     Current data model:
