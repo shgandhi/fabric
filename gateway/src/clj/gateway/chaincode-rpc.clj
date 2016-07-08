@@ -6,8 +6,7 @@
             [clj-http.client :as http]
             [flatland.protobuf.core :as fl]
             [clojure.data.codec.base64 :as base64]
-            [cheshire.core :as json]
-            [doric.core :as doric]))
+            [cheshire.core :as json]))
 
 (defn- encode [item] (-> item fl/protobuf-dump base64/encode (String. "UTF-8")))
 (defn- decode [type item] (->> item .getBytes base64/decode (fl/protobuf-load type)))
