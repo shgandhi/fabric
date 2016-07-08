@@ -20,10 +20,11 @@
                  [venantius/accountant "0.1.7"
                   :exclusions [org.clojure/tools.reader]]
 
-                 [clj-http.client]
-                 [flatland.protobuf.core]
-                 [clojure.data.codec.base64]
-                 [cheshire.core]]
+                 [org.clojure/data.codec "0.1.0"]
+                 [org.clojars.ghaskins/protobuf "0.3"]
+                 [clj-http "3.1.0"]
+                 [cheshire "5.6.3"]
+                 ]
 
   :plugins [[lein-environ "1.0.2"]
             [lein-cljsbuild "1.1.1"]
