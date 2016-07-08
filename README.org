@@ -4,5 +4,41 @@
 ** Getting Started
 ** API
 *** Record
+    Current data model:
+    global owner, recordHash
+    list trials
+    list messages
+
+    Proposed data model:
+    recordHash -> (owner, trials, messages)
+
+    Could rotate owner / recordHash
+**** Functions
+ #+begin_src proto3
+message EmptyParams {
+}
+
+message List {
+  repeated Item items = 1; 
+}
+
+message Item {
+  string data = 1; 
+}
+ #+end_src
+
+     AuthorizeTrial(Item)
+     RevokeAuthorization(Item)
+     SendMessage(Item)
+     DeleteMessage(Item)
+     Item GetRecord(EmptyParams)
+     List GetMessages(EmptyParams)
+     List GetAuthorizedTrials(EmptyParams)
+     
 *** TrialRegistry
-** Directory Structure
+    Trial registry tracks the currently running trials, with the following information:
+    - Description of trial
+    - Hash id of the trial
+
+      Seems redundant, we should probably just record a single list of active trials.
+      Could be merged with Record into a single master chaincode.
