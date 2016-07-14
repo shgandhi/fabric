@@ -1,0 +1,3 @@
+function='"Function": "trial-chain.chaincode.record/txn/1"'
+args='"Args": ["{\"Data\": \"'$1'\"}"]'
+peer chaincode invoke -n record -c "{$function, $args}"

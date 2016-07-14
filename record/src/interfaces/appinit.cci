@@ -1,0 +1,5 @@
+
+message Init {
+        bytes ownerPubKey = 1;
+        bytes recordHash = 2;
+}
