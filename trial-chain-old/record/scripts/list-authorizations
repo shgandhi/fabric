@@ -1,3 +1,0 @@
-function='"Function": "trial-chain.chaincode.record/query/2"'
-args='"Args": [""]'
-peer chaincode query -n record -c "{$function, $args}"

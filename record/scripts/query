@@ -1,2 +1,0 @@
-#!/bin/sh
-peer chaincode query -l golang -n record -c $1

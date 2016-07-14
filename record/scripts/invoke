@@ -1,2 +1,0 @@
-#!/bin/sh
-peer chaincode invoke -n $1 -c '{"Function": "invoke", "Args": ["a", "b", "10"]}'

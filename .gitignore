@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Local build binaries
 node-cli/node-cli
 *.pyc
@@ -21,12 +20,3 @@ tags
 go-carpet-coverage*
 # make node-sdk copied files
 sdk/node/lib/protos/*
-=======
-build/
-.lein-plugins
-node_modules/
-out/
-figwheel_server.log
-target/
-.lein-env
->>>>>>> b3a02d8b48196385ab39918ab45d3bfc4fcd398f

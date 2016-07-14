@@ -1,7 +1,0 @@
-build/
-.lein-plugins
-node_modules/
-out/
-figwheel_server.log
-target/
-.lein-env
