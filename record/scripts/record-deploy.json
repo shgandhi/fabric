@@ -1,0 +1,15 @@
+{
+  "jsonrpc": "2.0",
+  "method": "deploy",
+  "params": {
+    "type": 1,
+    "chaincodeID":{
+        "name":"record"
+    },
+    "ctorMsg": {
+        "function":"init",
+        "args":["ownerPubKey", "key", "recordHash", "hash"]
+    }
+  },
+  "id": 1
+}

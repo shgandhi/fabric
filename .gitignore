@@ -1,22 +1,7 @@
-# Local build binaries
-node-cli/node-cli
-*.pyc
-/build/*
-/bin
-.idea
-*.iml
-.DS_Store
-tags
-.tags
-.vagrant/
-/build
-# Emacs backup files
-*~
-*#
-.#*
-# bddtest log files
-*.log
-# go-carpet output files
-go-carpet-coverage*
-# make node-sdk copied files
-sdk/node/lib/protos/*
+build/
+.lein-plugins
+node_modules/
+out/
+figwheel_server.log
+target/
+.lein-env

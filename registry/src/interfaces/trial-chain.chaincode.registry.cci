@@ -1,0 +1,21 @@
+
+message TrialEntry {
+    bytes data = 1;
+}
+
+message List {
+    repeated TrialEntry trialEntries = 1;
+}
+
+message EmptyParams {
+}
+
+transactions {
+    void AddEntry(TrialEntry) = 1;
+    void RemoveEntry(TrialEntry) = 2;
+}
+
+queries {
+    TrialEntry GetTrialDescription(EmptyParams) = 1;
+    List GetTrialList(EmptyParams) = 2;
+}
