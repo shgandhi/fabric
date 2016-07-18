@@ -4,66 +4,90 @@ The web application has two components - _patient portal_ and _clinic portal_. T
 ## Workflow
 > Describes the workflow of the patient and the clinic portals
 
-#### Patient Portal
-> The patient portal is divided into two views
+### Patient Portal
+> The patient portal is divided into two views -
 
-##### Patient Login
+#### Patient Login
 Patient logs in to the Patient Portal
 ```
 Input: Record Hash, Patient Public Key
 ```
 
-##### Patient Actions Page
+#### Patient Actions Page
   - Read Trial Registry
-    ```
-    Input: Trial Description Hash
-    Output: Corresponding Trial OR List of all trials
-    ```
+```
+Input: Trial Description Hash
+Output: Corresponding Trial OR List of all trials
+```
     
   - Authorize Record
-    ```
-    Input: Clinic Public Key
-    ```
+```
+Input: Clinic Public Key
+```
     
   - Revoke Authorization
-    ```
-    Input: Clinic Public Key
-    ```
+```
+Input: Clinic Public Key
+```
     
   - Logout 
 
-###Clinic Portal
+### Clinic Portal
+> The clinic set activities can be grouped into four categories.
 
-1. Create EHR
-    - Generate Record Hash 
-        - Input: EHR file, Patient Public Key
-        - Output: Record Hash
+#### Create EHR
+  - Generate Record Hash 
+```
+Input: EHR file in pdf format, Patient Public Key
+Output: Record Hash
+```
     
-2. Upload Pending EHR (Requires Admin Access)
-    - Deploy Record Chaincode 
-    - Call Link Record 
-        - Input: Patient Public Key, Record Hash, Chaincode ID
-        - Output: Message ID
-    - Post EHR on IPFS Network
-        - Input: EHR file 
+  - Deploy Record Chaincode 
+```
+Input: Record Hash, Patient Public Key
+```
+    
+  - Call Link Record 
+```
+Input: Record Hash, Patient Public Key
+```
+  
+  - Upload EHR on IPFS Network
+```
+Input: EHR file
+```
 
-3. Scan Blockchain
-    - Input: Clinic Public Key
-    - Output: Populate all record hash of the chaincodes referencing the Clinic Public Key
+#### Scan Blockchain
+> The clinic periodically scans the blockchain for
+new blocks that contain its clinicPubKey . Once it finds one, it identifies the chaincode
+RecordXYZ that references it, notes down the associated recordHash and requests
+the EHR with that hash from the IPFS network.
 
-4. Retrieve Authorized EHR from IPFS Network
-    - Input: Record Hash
-    - Output: EHR file 
+```
+Input: Clinic Public Key
+Output: List of Record hashes
+```
 
-5. Post a Message on IPFS
-    - Input: Message Text, owner Public Key
-    - Output: Message Hash
+#### Retrieve Authorized EHR from IPFS Network
+```
+Input: Record Hash
+Output: EHR file 
+```
 
-6. Notify 
-    - Input: Message Hash, Record Hash
-    - Action: Call notify on Record chaincode
-    - Ouput: Message Hash
+#### Post a Message on IPFS
+```
+Input: Message Text, owner Public Key
+Output: Message Hash
+```
 
-###To Do UI related tasks
+#### Notify 
+```
+Input: Message Hash, Record Hash
+Ouput: Message Hash
+```
+
+#### To Do UI related tasks
 
 1. Implement Notify on Patient Portal
+2. Validate all input fields
+3. Get upload file buttons working
