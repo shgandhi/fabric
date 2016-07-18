@@ -39,16 +39,16 @@ message List {
 message Item {
   string data = 1; 
 }
- #+end_src
 
-     AuthorizeTrial(Item)
-     RevokeAuthorization(Item)
-     SendMessage(Item)
-     DeleteMessage(Item)
-     Item GetRecord(EmptyParams)
-     List GetMessages(EmptyParams)
-     List GetAuthorizedTrials(EmptyParams)
-     
+AuthorizeTrial(Item)
+RevokeAuthorization(Item)
+SendMessage(Item)
+DeleteMessage(Item)
+Item GetRecord(EmptyParams)
+List GetMessages(EmptyParams)
+List GetAuthorizedTrials(EmptyParams)
+#+end_src
+
 *** TrialRegistry
     Trial registry tracks the currently running trials, with the following information:
     - Description of trial
