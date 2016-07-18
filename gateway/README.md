@@ -10,7 +10,7 @@ The web application has two components - _patient portal_ and _clinic portal_. T
 #### Patient Login
 Patient logs in to the Patient Portal
 ```
-Input: Record Hash, Patient Public Key
+Input: Record Hash, Trial Public Key
 ```
 
 #### Patient Actions Page
