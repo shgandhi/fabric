@@ -16,16 +16,16 @@
 
 1. Create EHR
     - Generate Record Hash 
-        Input: EHR file, Patient Public Key
-        Output: Record Hash
+        - Input: EHR file, Patient Public Key
+        - Output: Record Hash
     
 2. Upload Pending EHR (Requires Admin Access)
     - Deploy Record Chaincode 
     - Call Link Record 
-        Input: Patient Public Key, Record Hash, Chaincode ID
-        Output: Message ID
+        - Input: Patient Public Key, Record Hash, Chaincode ID
+        - Output: Message ID
     - Post EHR on IPFS Network
-        Input: EHR file 
+        - Input: EHR file 
 
 3. Scan Blockchain
     - Input: Clinic Public Key
