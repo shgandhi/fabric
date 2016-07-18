@@ -1,16 +1,36 @@
-##Trial-chain Web App Workflow
+# Trial-chain Web Application
+The web application has two components - _patient portal_ and _clinic portal_. The patient portal or the gateway handles the patient interaction with the blockchain chaincodes _Trial Registry_ and _RecordXYZ_. The clinic portal is used to manage clinic interaction with both the chaincodes.
 
-###Patient Portal
+## Workflow
+> Describes the workflow of the patient and the clinic portals
 
-1. Patient Login
-    - Patient logins to the Patient Portal
-        Input: Record Hash, Patient Public Key
+#### Patient Portal
+> The patient portal is divided into two views
 
-2. Patient Actions Page 
-    - Read Trial Registry
-    - Authorize Record
-    - Revoke Authorization
-    - Logout 
+##### Patient Login
+Patient logs in to the Patient Portal
+```
+Input: Record Hash, Patient Public Key
+```
+
+##### Patient Actions Page
+  - Read Trial Registry
+    ```
+    Input: Trial Description Hash
+    Output: Corresponding Trial OR List of all trials
+    ```
+    
+  - Authorize Record
+    ```
+    Input: Clinic Public Key
+    ```
+    
+  - Revoke Authorization
+    ```
+    Input: Clinic Public Key
+    ```
+    
+  - Logout 
 
 ###Clinic Portal
 
