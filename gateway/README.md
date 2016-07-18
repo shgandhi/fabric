@@ -69,18 +69,23 @@ Output: List of Record hashes
 ```
 
 #### Retrieve Authorized EHR from IPFS Network
+> Locates RecordXYZ that corresponds to EHR with hash recordHash
 ```
 Input: Record Hash
 Output: EHR file 
 ```
 
-#### Post a Message on IPFS
+#### Upload a Message on IPFS
+> Encodes message with the chaincode’s ownerPubKey , and posts it on the IPFS
+network. Records the encoded message’s hash, messageHash
 ```
 Input: Message Text, owner Public Key
 Output: Message Hash
 ```
 
-#### Notify 
+#### Notify
+> Invokes the Notify(messageHash) on RecordXYZ . This is
+posted on the blockchain.
 ```
 Input: Message Hash, Record Hash
 Ouput: Message Hash
