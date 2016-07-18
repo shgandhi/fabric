@@ -125,6 +125,60 @@ body {
 }
 
 /*
+ * Placeholder dashboard ideas
+ */
+
+.placeholders {
+  margin-left: 300px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+.placeholders h4 {
+  margin-bottom: 0;
+}
+.placeholder {
+  margin-bottom: 20px;
+}
+.placeholder img {
+  display: inline-block;
+  border-radius: 50%;
+}
+
+/*
+ * Login Page content
+ */
+
+.dashboard-content {
+  margin-top: 20px;
+  margin-left: 600px;
+  margin-right: 250px;
+  padding-right: 100px;
+}
+
+.dashboard-content .dashboard-content-title {
+  margin-top: 50px;
+  margin-left: 50px;
+}
+
+.dashboard-content .dashboard-content-body {
+  margin-left: 50px;
+  margin-right: -50px;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.dashboard-content .dashboard-content-footer {
+  margin-top: 0px;
+  margin-left: 465px;
+  margin-bottom: 30px;
+}
+
+.upload_ehr_btn {
+  margin-top: 10px;
+  margin-left: 430px;
+} 
+
+/*
  * Header Styles
  */ 
 h1, h2, h3 {
@@ -143,6 +197,16 @@ h2 {
 }
 
 h3 {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font: bold; 
+}
+
+h4 {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font: bold; 
+}
+
+h5 {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font: bold; 
 }
