@@ -27,6 +27,7 @@
                  [org.clojars.ghaskins/protobuf "0.3"]
                  [clj-http "3.1.0"]
                  [cheshire "5.6.3"]
+                 [slingshot "0.12.2"]
                  ]
   
   :plugins [[lein-environ "1.0.2"]
@@ -49,6 +50,7 @@
    [:cljsbuild :builds :app :compiler :output-to]]
 
   :source-paths ["src/clj" "src/cljc"]
+  :java-source-paths ["src"]
   :test-paths ["spec/clj"]
   :resource-paths ["resources" "target/cljsbuild"]
 
