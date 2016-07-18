@@ -3,6 +3,7 @@
             [compojure.route :refer [not-found resources]]
             [hiccup.page :refer [include-js include-css html5]]
             [gateway.middleware :refer [wrap-middleware]]
+            [selmer.parser :as parser]
             [config.core :refer [env]]))
 
 (def mount-target
@@ -38,11 +39,20 @@
     (head)
     [:body "Test!"]))
 
+(defn resource [r]
+ (-> (Thread/currentThread)
+     (.getContextClassLoader)
+     (.getResource r)
+     slurp))
+
 (defroutes routes
-  (GET "/" [] loading-page)
-  (GET "/about" [] loading-page)
-  (GET "/cards" [] cards-page)
-  (GET "/test" [] test-page)  
+  (GET "/" [] 
+     (parser/render-file "templates/app.html"
+                        {:forms-css (resource "reagent-forms.css")
+                         :json-css (resource "json.human.css")}))
+  ;;(GET "/about" [] loading-page)
+  ;;(GET "/cards" [] cards-page)
+  ;;(GET "/test" [] test-page)  
   (resources "/")
   (not-found "Not Found"))
 
