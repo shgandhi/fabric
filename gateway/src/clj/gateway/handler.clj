@@ -5,7 +5,7 @@
             [gateway.middleware :refer [wrap-middleware]]
             [selmer.parser :as parser]
             [config.core :refer [env]]
-            [gateway.chaincode-rpc]))
+            [gateway.registry]))
 
 (def mount-target
   [:div#app
