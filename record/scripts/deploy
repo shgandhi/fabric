@@ -1,5 +1,0 @@
-#!/bin/bash
-pushd ../client
-nodejs out/trial-chain.js -c deploy -n record
-popd
-
