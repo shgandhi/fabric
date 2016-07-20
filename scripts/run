@@ -1,1 +1,1 @@
-CORE_CHAINCODE_ID_NAME=record CORE_PEER_ADDRESS=0.0.0.0:30303 CORE_LOGGING_LEVEL=debug ../build/bin/trial-chain.chaincode.record-0.1
+CORE_CHAINCODE_ID_NAME=registry CORE_PEER_ADDRESS=0.0.0.0:30303 CORE_LOGGING_LEVEL=debug ../registry/build/bin/trial-chain.chaincode.registry-0.1
