@@ -1,5 +1,5 @@
 #!/bin/bash
 pushd ../registry/client
-nodejs out/trial-chain.js -c deploy -n registry
+nodejs out/registry.js -c deploy -n registry
 popd
 

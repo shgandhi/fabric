@@ -11,7 +11,7 @@
     (.build builder name)))
 
 (def init (loadproto "appinit"))
-(def app (loadproto "trial_chain.chaincode.registry"))
+(def app (loadproto "registry"))
 
 (defn deploy [{:keys [args] :as options}]
   (rpc/deploy (assoc options
@@ -21,7 +21,7 @@
 
 (defn invoke [index args options]
   (rpc/invoke (assoc options
-                     :func (+ "trial-chain.chaincode.registry/txn/" index)
+                     :func (+ "registry/txn/" index)
                      :args args
                      :cb (fn [resp] (println "Response:" resp)))))
 
@@ -50,7 +50,7 @@
 
 (defn get-patient-key [{:keys [args] :as options}]
   (rpc/query (assoc options
-                    :func "trial-chain.chaincode.registry/query/1"
+                    :func "registry/query/1"
                     :args (app.Item. args)
                     :cb (fn [resp]
                           (if (= (->> resp :result :status) "OK")
@@ -61,7 +61,7 @@
 
 (defn get-trial-list [{:keys [args] :as options}]
   (rpc/query (assoc options
-                    :func "trial-chain.chaincode.registry/query/2"
+                    :func "registry/query/2"
                     :args (app.EmptyParams. args)
                     :cb (fn [resp]
                           (if (= (->> resp :result :status) "OK")
@@ -74,7 +74,7 @@
 
 (defn get-messages [{:keys [args] :as options}]
   (rpc/query (assoc options
-                    :func "trial-chain.chaincode.registry/query/3"
+                    :func "registry/query/3"
                     :args (app.Item. args)
                     :cb (fn [resp]
                           (if (= (->> resp :result :status) "OK")
@@ -85,7 +85,7 @@
 
 (defn get-authorized-trials [{:keys [args] :as options}]
   (rpc/query (assoc options
-                    :func "trial-chain.chaincode.registry/query/4"
+                    :func "registry/query/4"
                     :args (app.Item. args)
                     :cb (fn [resp]
                           (if (= (->> resp :result :status) "OK")

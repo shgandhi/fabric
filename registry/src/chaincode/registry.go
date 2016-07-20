@@ -22,7 +22,7 @@ import (
 	
 	"hyperledger/ccs"
 	"hyperledger/cci/appinit"
-	"hyperledger/cci/trial-chain/chaincode/registry"
+	"hyperledger/cci/registry"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -185,7 +185,7 @@ func (t *Registry) GetAuthorizedTrials(stub *shim.ChaincodeStub, record *registr
 func main() {
 	self := &Registry{}
 	interfaces := ccs.Interfaces {
-		"trial-chain.chaincode.registry": self,
+		"registry": self,
 		"appinit": self,
 	}
 

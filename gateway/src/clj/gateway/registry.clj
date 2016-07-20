@@ -1,5 +1,5 @@
 (ns gateway.registry
-  (:import [record
+  (:import [registry
             Interface$Item
             Interface$List
             Interface$EmptyParams
