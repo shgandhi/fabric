@@ -19,7 +19,6 @@ package main
 
 import (
 	"fmt"
-	"bytes"
 	
 	"hyperledger/ccs"
 	"hyperledger/cci/appinit"
@@ -74,7 +73,7 @@ func (t *Registry) AuthorizeTrial(stub *shim.ChaincodeStub, pair *registry.Pair)
 		return err
 	}
 
-	trial := &registry.Item{Data: []byte(pair.Value)}
+	trial := &registry.Item{Data: pair.Value}
 	record.Trials.Items = append(record.Trials.Items, trial)
 
 	return t.PutState(stub, record.Hash, record)
@@ -90,7 +89,7 @@ func (t *Registry) RevokeAuthorization(stub *shim.ChaincodeStub, pair *registry.
 		return err
 	}
 
-	trial := &registry.Item{Data: []byte(pair.Value)}
+	trial := &registry.Item{Data: pair.Value}
 	record.Trials = removeItem(record.Trials, trial)
 
 	return t.PutState(stub, record.Hash, record)
@@ -106,14 +105,14 @@ func (t *Registry) SendMessage(stub *shim.ChaincodeStub, pair *registry.Pair) er
 		return err
 	}
 
-	msg := &registry.Item{Data: []byte(pair.Value)}
+	msg := &registry.Item{Data: pair.Value}
 	record.Messages.Items = append(record.Messages.Items, msg)
 
 	return t.PutState(stub, record.Hash, record)
 }
 
 //DeleteMessage - Deletes a message to a patient
-func (t *Registry) DeletMessage(stub *shim.ChaincodeStub, pair *registry.Pair) error {
+func (t *Registry) DeleteMessage(stub *shim.ChaincodeStub, pair *registry.Pair) error {
 	fmt.Printf("Deleting message %s from record %s", pair.Value, pair.Key)
 
 	record := &registry.Record{}
@@ -122,7 +121,7 @@ func (t *Registry) DeletMessage(stub *shim.ChaincodeStub, pair *registry.Pair) e
 		return err
 	}
 
-	msg := &registry.Item{Data: []byte(pair.Value)}
+	msg := &registry.Item{Data: pair.Value}
 	record.Messages = removeItem(record.Messages, msg)
 
 	return t.PutState(stub, record.Hash, record)
@@ -131,14 +130,14 @@ func (t *Registry) DeletMessage(stub *shim.ChaincodeStub, pair *registry.Pair) e
 //GetPatientKey - Retrieve patient public key from record data
 func (t *Registry) GetPatientKey(stub *shim.ChaincodeStub, record *registry.Item) (*registry.Item, error) {
 	data := &registry.Record{}
-	err := t.GetState(stub, string(record.Data[:]), data)
+	err := t.GetState(stub, record.Data, data)
 	if err != nil {
 		return nil, err
 	}
 
 	fmt.Printf("Patient key: %v\n", data.Patient)
 
-	patient := &registry.Item{Data: []byte(data.Patient)}
+	patient := &registry.Item{Data: data.Patient}
 	return patient, nil
 }
 
@@ -157,7 +156,7 @@ func (t *Registry) GetTrialList(stub *shim.ChaincodeStub, params *registry.Empty
 //GetMessages to get all messages for a patient
 func (t *Registry) GetMessages(stub *shim.ChaincodeStub, record *registry.Item) (*registry.List, error) {
 	data := &registry.Record{}
-	err := t.GetState(stub, string(record.Data[:]), data)
+	err := t.GetState(stub, record.Data, data)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +170,7 @@ func (t *Registry) GetMessages(stub *shim.ChaincodeStub, record *registry.Item) 
 //GetAuthorizedTrials - Get a list of all trials authorized to use this record
 func (t *Registry) GetAuthorizedTrials(stub *shim.ChaincodeStub, record *registry.Item) (*registry.List, error) {
 	data := &registry.Record{}
-	err := t.GetState(stub, string(record.Data[:]), data)
+	err := t.GetState(stub, record.Data, data)
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +256,7 @@ func removeItem(list *registry.List, item *registry.Item) *registry.List {
 	//loop through items, keeping everything but the item to be removed
 	updated := &registry.List{}
 	for _, i := range list.Items {
-		if !bytes.Equal(i.Data, item.Data) {
+		if i.Data != item.Data {
 			updated.Items = append(updated.Items, i)
 		}
 	}

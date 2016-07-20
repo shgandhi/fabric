@@ -1,6 +1,6 @@
 
 message Item {
-  bytes data = 1;
+  string data = 1;
 }
 
 message List {
