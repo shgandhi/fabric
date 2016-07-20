@@ -1,29 +1,46 @@
-(ns trial-chain.main
+(ns registry.main
   (:require [clojure.string :as string]
             [cljs.nodejs :as nodejs]
             [cljs.tools.cli :refer [parse-opts]]
-            [trial-chain.core :as core]))
+            [registry.core :as core]))
 
 
 (nodejs/enable-util-print!)
 
 (def _commands
   [["deploy"
-    {:fn core/deploy
-     :default-args #js {:trialHash "hash"}}]
-   ["add-entry"
-    {:fn core/add-entry
-     :default-args #js {:data "Trial"}}]
-   ["remove-entry"
-    {:fn core/remove-entry
-     :default-args #js {:data "Trial"}}]
+    {:fn core/deploy}]
+   ["add-trial"
+    {:fn core/add-trial
+     :default-args #js {:data "TrialHash"}}]
+   ["remove-trial"
+    {:fn core/remove-trial
+     :default-args #js {:data "TrialHash"}}]
+   ["add-record"
+    {:fn core/add-record
+     :default-args #js
+     {:hash "RecordHash"
+      :patient "PatientKey"}}]
+   ["authorize-trial"
+    {:fn core/authorize-trial
+     :default-args #js {:data "TrialHash"}}]
+   ["revoke-authorization"
+    {:fn core/revoke-authorization
+     :default-args #js {:data "TrialHash"}}]
+   ["send-message"
+    {:fn core/send-message
+     :default-args #js {:data "Hello!"}}]
+   ["delete-message"
+    {:fn core/delete-message
+     :default-args #js {:data "Hello!"}}]
 
-   ["get-trial-description"
-    {:fn core/get-trial-description
-     :default-args #js {}}]
+   ["get-patient-key"
+    {:fn core/get-patient-key}]
    ["get-trial-list"
     {:fn core/get-trial-list
-     :default-args #js {}}]])
+     :default-args #js {}}]
+   ["get-authorized-trials"
+    {:fn core/get-authorized-trials}]])
    
 (def commands (into {} _commands))
 (defn print-commands [] (->> commands keys vec print-str))
@@ -38,7 +55,7 @@
    ["-p" "--path PATH" "Path/URL to the chaincode (deploy only, mutually exclsive with -n)"]
    ["-n" "--name NAME" "Name of the chaincode (mutually exclusive with -p)"]
    ["-c" "--command CMD" (str "One of " (print-commands))
-    :default "get-trial-description"
+    :default "get-trial-list"
     :validate [#(contains? commands %) (str "Supported commands: " (print-commands))]]
    ["-a" "--args ARGS" "JSON formatted arguments to submit"]
    ["-h" "--help"]])

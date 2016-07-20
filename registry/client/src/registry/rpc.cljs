@@ -1,4 +1,4 @@
-(ns trial-chain.rpc
+(ns registry.rpc
   (:require [cljs.nodejs :as nodejs]))
 
 (def http (nodejs/require "http"))
