@@ -30,59 +30,122 @@ import (
 )
 
 const (
-	trialHash = "trialHash"
+	trials = "trials"
 )
 
-//Registry Implementation
+//Registry struct for type dispatch
 type Registry struct {
 }
 
 //Init called to initialize the chaincode
 func (t *Registry) Init(stub *shim.ChaincodeStub, param *appinit.Init) error {	
-	fmt.Printf("Listing the trial description %s\n", param.TrialHash)
-
-	hash := &registry.TrialEntry{Data: param.TrialHash}
-	data, err := proto.Marshal(hash)
-	if err != nil {
-		return err
-	}
-	err = stub.PutState(trialHash, data)
-	if err != nil {
-		return err
-	}
-
+	// all data is added in later invocations
 	return nil
 }
 
 
-//AddEntry - adds entry to the ledger
-func (t *Registry) AddEntry(stub *shim.ChaincodeStub, trialEntry *registry.TrialEntry) error {
-	fmt.Printf("Adding trial: %s", trialEntry.Data)
-	return t.AddItem(stub, trialHash, trialEntry)
+//AddTrial - adds entry to the ledger
+func (t *Registry) AddTrial(stub *shim.ChaincodeStub, trial *registry.Item) error {
+	fmt.Printf("Adding trial: %s", trial.Data)
+	return t.AddItem(stub, trials, trial)
 }
 
 //RemoveEntry - removes entry from the ledger
-func (t *Registry) RemoveEntry(stub *shim.ChaincodeStub, trialEntry *registry.TrialEntry) error {
-	fmt.Printf("Revoking authorization from trial: %s", trialEntry.Data)
-	return t.RemoveItem(stub, trialHash, trialEntry)
+func (t *Registry) RemoveTrial(stub *shim.ChaincodeStub, trial *registry.Item) error {
+	fmt.Printf("Revoking authorization from trial: %s", trial.Data)
+	//Remove trial from list of trials
+	return t.RemoveItem(stub, trials, trial)
 }
 
-//GetTrialDescription callback representing the query of a chaincode
-func (t *Registry) GetTrialDescription(stub *shim.ChaincodeStub, params *registry.EmptyParams) (*registry.TrialEntry, error) {
-	data := &registry.TrialEntry{}
-	err := t.GetState(stub, trialHash, data)
+//AddRecord - adds patient health record to the ledger
+func (t *Registry) AddRecord(stub *shim.ChaincodeStub, record *registry.Record) error {
+	fmt.Printf("Adding record: %s", record)
+
+	return t.PutState(stub, record.Hash, record)
+}
+
+//AuthorizeTrial - Authorizes a trial to use a patient record
+func (t *Registry) AuthorizeTrial(stub *shim.ChaincodeStub, pair *registry.Pair) error {
+	fmt.Printf("Authorizing trial %s to use record %s", pair.Value, pair.Key)
+
+	record := &registry.Record{}
+	err := t.GetState(stub, pair.Key, record)
+	if err != nil {
+		return err
+	}
+
+	trial := &registry.Item{Data: []byte(pair.Value)}
+	record.Trials.Items = append(record.Trials.Items, trial)
+
+	return t.PutState(stub, record.Hash, record)
+}
+
+//RevokeAuthorization - Revokes a trials access to a patient record
+func (t *Registry) RevokeAuthorization(stub *shim.ChaincodeStub, pair *registry.Pair) error {
+	fmt.Printf("Revoking access from trial %s for record %s", pair.Value, pair.Key)
+
+	record := &registry.Record{}
+	err := t.GetState(stub, pair.Key, record)
+	if err != nil {
+		return err
+	}
+
+	trial := &registry.Item{Data: []byte(pair.Value)}
+	record.Trials = removeItem(record.Trials, trial)
+
+	return t.PutState(stub, record.Hash, record)
+}
+
+//SendMessage - Sends a message to a patient
+func (t *Registry) SendMessage(stub *shim.ChaincodeStub, pair *registry.Pair) error {
+	fmt.Printf("Sending message %s to record %s", pair.Value, pair.Key)
+
+	record := &registry.Record{}
+	err := t.GetState(stub, pair.Key, record)
+	if err != nil {
+		return err
+	}
+
+	msg := &registry.Item{Data: []byte(pair.Value)}
+	record.Messages.Items = append(record.Messages.Items, msg)
+
+	return t.PutState(stub, record.Hash, record)
+}
+
+//DeleteMessage - Deletes a message to a patient
+func (t *Registry) DeletMessage(stub *shim.ChaincodeStub, pair *registry.Pair) error {
+	fmt.Printf("Deleting message %s from record %s", pair.Value, pair.Key)
+
+	record := &registry.Record{}
+	err := t.GetState(stub, pair.Key, record)
+	if err != nil {
+		return err
+	}
+
+	msg := &registry.Item{Data: []byte(pair.Value)}
+	record.Messages = removeItem(record.Messages, msg)
+
+	return t.PutState(stub, record.Hash, record)
+}
+
+//GetPatientKey - Retrieve patient public key from record data
+func (t *Registry) GetPatientKey(stub *shim.ChaincodeStub, record *registry.Item) (*registry.Item, error) {
+	data := &registry.Record{}
+	err := t.GetState(stub, string(record.Data[:]), data)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Printf("Query Response: %v\n", data)
-	return data, nil
+	fmt.Printf("Patient key: %v\n", data.Patient)
+
+	patient := &registry.Item{Data: []byte(data.Patient)}
+	return patient, nil
 }
 
 //GetTrialList to get all trials
 func (t *Registry) GetTrialList(stub *shim.ChaincodeStub, params *registry.EmptyParams) (*registry.List, error) {
 	list := &registry.List{}
-	err := t.GetState(stub, trialHash, list)
+	err := t.GetState(stub, trials, list)
 	if err != nil {
 		return nil, err
 	}
@@ -91,8 +154,35 @@ func (t *Registry) GetTrialList(stub *shim.ChaincodeStub, params *registry.Empty
 	return list, nil
 }
 
+//GetMessages to get all messages for a patient
+func (t *Registry) GetMessages(stub *shim.ChaincodeStub, record *registry.Item) (*registry.List, error) {
+	data := &registry.Record{}
+	err := t.GetState(stub, string(record.Data[:]), data)
+	if err != nil {
+		return nil, err
+	}
 
-// Main----------------------------------------------------------------------------------------------------
+	messages := data.Messages
+
+	fmt.Printf("Messages: %v\n", )
+	return messages, nil
+}
+
+//GetAuthorizedTrials - Get a list of all trials authorized to use this record
+func (t *Registry) GetAuthorizedTrials(stub *shim.ChaincodeStub, record *registry.Item) (*registry.List, error) {
+	data := &registry.Record{}
+	err := t.GetState(stub, string(record.Data[:]), data)
+	if err != nil {
+		return nil, err
+	}
+
+	ts := data.Trials
+
+	fmt.Printf("Trials: %v\n", )
+	return ts, nil
+}
+
+// Main--------------------------------------------------------------------
 func main() {
 	self := &Registry{}
 	interfaces := ccs.Interfaces {
@@ -108,7 +198,7 @@ func main() {
 	}
 }
 
-// Helpers-------------------------------------------------------------------------------------------------
+// Helpers-----------------------------------------------------------------
 
 //PutState helper
 func (t *Registry) PutState(stub *shim.ChaincodeStub, column string, pb proto.Message) error {
@@ -142,7 +232,7 @@ func (t *Registry) GetState(stub *shim.ChaincodeStub, column string, data proto.
 }
 
 //AddItem helper
-func (t *Registry) AddItem(stub *shim.ChaincodeStub, location string, trialEntry *registry.TrialEntry) error {
+func (t *Registry) AddItem(stub *shim.ChaincodeStub, location string, item *registry.Item) error {
 	//load current items
 	list := &registry.List{}
 	err := t.GetState(stub, location, list)
@@ -151,7 +241,7 @@ func (t *Registry) AddItem(stub *shim.ChaincodeStub, location string, trialEntry
 	}
 
 	//append new item to list
-	list.TrialEntries = append(list.TrialEntries, trialEntry)
+	list.Items = append(list.Items, item)
 	fmt.Printf("List: %v\n", list)
 
 	//store updated list
@@ -163,21 +253,26 @@ func (t *Registry) AddItem(stub *shim.ChaincodeStub, location string, trialEntry
 	return nil
 }
 
-//RemoveItem helper
-func (t *Registry) RemoveItem(stub *shim.ChaincodeStub, location string, trialEntry *registry.TrialEntry) error {
+func removeItem(list *registry.List, item *registry.Item) *registry.List {
+	//loop through items, keeping everything but the item to be removed
+	updated := &registry.List{}
+	for _, i := range list.Items {
+		if !bytes.Equal(i.Data, item.Data) {
+			updated.Items = append(updated.Items, i)
+		}
+	}
+	return updated
+}
+
+//Remove Item from list in the datastore
+func (t *Registry) RemoveItem(stub *shim.ChaincodeStub, location string, item *registry.Item) error {
 	list := &registry.List{}
 	err := t.GetState(stub, location, list)
 	if err != nil {
 		return err
 	}
 
-	//loop through trials, keeping everything but the trial to be removed
-	updated := &registry.List{}
-	for _, i := range list.TrialEntries {
-		if !bytes.Equal(i.Data, trialEntry.Data) {
-			updated.TrialEntries = append(updated.TrialEntries, i)
-		}
-	}
+	updated := removeItem(list, item)
 
 	//store updated list
 	return t.PutState(stub, location, updated)

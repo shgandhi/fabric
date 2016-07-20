@@ -1,4 +1,3 @@
 
 message Init {
-        bytes trialHash = 1;
 }

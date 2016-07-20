@@ -1,21 +1,42 @@
 
-message TrialEntry {
-    bytes data = 1;
+message Item {
+  bytes data = 1;
 }
 
 message List {
-    repeated TrialEntry trialEntries = 1;
+  repeated Item items = 1;
+}
+
+message Record {
+  string hash = 1;
+  string patient = 2;
+  List messages = 3;
+  List trials = 4;
+}
+
+message Pair {
+  string key = 1;
+  string value = 2;
 }
 
 message EmptyParams {
 }
 
 transactions {
-    void AddEntry(TrialEntry) = 1;
-    void RemoveEntry(TrialEntry) = 2;
+  void AddTrial(Item) = 1;
+  void RemoveTrial(Item) = 2;
+
+  void AddRecord(Record) = 3;
+  void AuthorizeTrial(Pair) = 4;
+  void RevokeAuthorization(Pair) = 5;
+  void SendMessage(Pair) = 6;
+  void DeleteMessage(Pair) = 7;
 }
 
 queries {
-    TrialEntry GetTrialDescription(EmptyParams) = 1;
-    List GetTrialList(EmptyParams) = 2;
+  Item GetPatientKey(Item) = 1;
+
+  List GetTrialList(EmptyParams) = 2;
+  List GetMessages(Item) = 3;
+  List GetAuthorizedTrials(Item) = 4;
 }
