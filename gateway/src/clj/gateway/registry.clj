@@ -2,6 +2,8 @@
   (:import [registry
             Interface$Item
             Interface$List
+            Interface$Record
+            Interface$Pair
             Interface$EmptyParams
             ])
   (:require [clojure.java.io :as io]
@@ -14,6 +16,8 @@
 
 (def Item (fl/protodef Interface$Item))
 (def List (fl/protodef Interface$List))
+(def Record (fl/protodef Interface$Record))
+(def Pair (fl/protodef Interface$Pair))
 (def EmptyParams (fl/protodef Interface$EmptyParams))
 
 (defn- encode [item] (-> item fl/protobuf-dump base64/encode (String. "UTF-8")))
@@ -22,22 +26,18 @@
 (defn- bytes->str [bytes]
   (apply str (map char bytes)))
 
-(defn- unpack-item [item]
-  (->> item :data bytes->str))
-
-(defn- unpack-list [list]
-  (->> list :items (map unpack-item)))
-
 (defmulti unpack #(first %&))
 (defmethod unpack List
   [_ list]
-  (unpack-list (decode List list)))
+  (->> (decode List list) :items (map :data)))
 (defmethod unpack Item
   [_ item]
-  (unpack-item (decode Item item)))
+  (:data (decode Item item)))
+(defmethod unpack :default
+  [type data]
+  (decode type data))
 
 (defn pack [type & {:as args}]
-  (prn args)
   (encode (fl/protobuf type args)))
 
 ;; throws an exception that should unwind us all the way to the core/main
@@ -51,7 +51,7 @@
 ;;-----------------------------------------------------------------------------
 ;; post - performs a synchronous http/jsonrpc to the server, evaluating to the response
 ;;-----------------------------------------------------------------------------
-(defn post [{:keys [method name func args] :as options}]
+(defn post [{:keys [method name func args] :as options :or {name "registry"}}]
   (let [body {:jsonrpc "2.0"
               :method method
               :params {:type 3
@@ -77,6 +77,47 @@
       (abort -1 (str response)))))
 
 ;;-----------------------------------------------------------------------------
+;; RPC function invocations
+;;-----------------------------------------------------------------------------
+(defn invoke [{:as options}]
+  (post (assoc options :method "invoke")))
+
+(defn add-trial [trial & {:as options}]
+  (invoke (assoc options
+                 :func "registry/txn/1"
+                 :args (fl/protobuf Item :data trial))))
+
+(defn remove-trial [trial & {:as options}]
+  (invoke (assoc options
+                 :func "registry/txn/2"
+                 :args (fl/protobuf Item :data trial))))
+
+(defn add-record [record & {:as options}]
+  (invoke (assoc options
+                 :func "registry/txn/3"
+                 :args (fl/protobuf Record record))))
+
+(defn authorize-trial [record trial & {:as options}]
+  (invoke (assoc options
+                 :func "registry/txn/4"
+                 :args (fl/protobuf Pair :key record :value trial))))
+
+(defn revoke-authorization [record trial & {:as options}]
+  (invoke (assoc options
+                 :func "registry/txn/5"
+                 :args (fl/protobuf Pair :key record :value trial))))
+
+(defn send-message [record message & {:as options}]
+  (invoke (assoc options
+                 :func "registry/txn/6"
+                 :args (fl/protobuf Pair :key record :value message))))
+
+(defn delete-message [record message & {:as options}]
+  (invoke (assoc options
+                 :func "registry/txn/7"
+                 :args (fl/protobuf Pair :key record :value message))))
+
+;;-----------------------------------------------------------------------------
 ;; get-* operations invoke specific query operations
 ;;-----------------------------------------------------------------------------
 (defn- rpc-get
@@ -85,23 +126,30 @@
   (if-let [response (query options)]
     (unpack return-type response)))
 
-(defn get-record
-  "gets the record"
-  [options]
+(defn get-patient-key
+  "gets the patient key associated with a record"
+  [record & {:as options}]
   (rpc-get Item (assoc options
-                  :func "trial-chain.chaincode.record/query/1"
+                  :func "registry/query/1"
+                  :args (fl/protobuf Item :data record))))
+
+(defn get-trial-list
+  "gets a list of all active trials"
+  [&{:as options}]
+  (rpc-get List (assoc options
+                  :func "registry/query/2"
                   :args (fl/protobuf EmptyParams))))
 
 (defn get-messages
   "gets all messages stored for patient"
-  [options]
+  [record & {:as options}]
   (rpc-get List (assoc options
-                  :func "trial-chain.chaincode.record/query/2"
-                  :args (fl/protobuf EmptyParams))))
+                  :func "registry/query/3"
+                  :args (fl/protobuf Item :data record))))
 
 (defn get-authorized-trials
   "gets all messages stored for patient"
-  [options]
+  [record & {:as options}]
   (rpc-get List (assoc options
-                  :func "trial-chain.chaincode.record/query/3"
-                  :args (fl/protobuf EmptyParams))))
+                  :func "registry/query/4"
+                  :args (fl/protobuf Item :data record))))

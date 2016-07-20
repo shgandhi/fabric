@@ -74,6 +74,11 @@ func (t *Registry) AuthorizeTrial(stub *shim.ChaincodeStub, pair *registry.Pair)
 	}
 
 	trial := &registry.Item{Data: pair.Value}
+
+	if record.Trials == nil {
+		record.Trials = &registry.List{}
+	}
+	
 	record.Trials.Items = append(record.Trials.Items, trial)
 
 	return t.PutState(stub, record.Hash, record)
@@ -106,6 +111,11 @@ func (t *Registry) SendMessage(stub *shim.ChaincodeStub, pair *registry.Pair) er
 	}
 
 	msg := &registry.Item{Data: pair.Value}
+
+	if record.Messages == nil {
+		record.Messages = &registry.List{}
+	}
+	
 	record.Messages.Items = append(record.Messages.Items, msg)
 
 	return t.PutState(stub, record.Hash, record)
@@ -162,6 +172,9 @@ func (t *Registry) GetMessages(stub *shim.ChaincodeStub, record *registry.Item) 
 	}
 
 	messages := data.Messages
+	if messages == nil {
+		return &registry.List{}, nil
+	}
 
 	fmt.Printf("Messages: %v\n", )
 	return messages, nil
@@ -176,6 +189,9 @@ func (t *Registry) GetAuthorizedTrials(stub *shim.ChaincodeStub, record *registr
 	}
 
 	ts := data.Trials
+	if ts == nil {
+		return &registry.List{}, nil
+	}
 
 	fmt.Printf("Trials: %v\n", )
 	return ts, nil
