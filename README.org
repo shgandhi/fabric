@@ -18,20 +18,20 @@
     
 ** Tools
    The repository includes a Makefile with the following targets:
- - chaincode
-   Builds the chaincode in ~registry/~
- - client
-   Builds the cljs client in ~registry/client~, and copies the necessary .proto files from the chaincode
- - interface
-   Builds the java interface files used by the gateway
+**** chaincode
+    Builds the chaincode in ~registry/~
+**** client
+    Builds the cljs client in ~registry/client~, and copies the necessary .proto files from the chaincode
+**** interface
+    Builds the java interface files used by the gateway
 
-   Additionally, there are several helper targets that make it easier to run the chaincode during development:
- - dev
-   Start a peer in dev-mode, without security
- - run
-   Launch the chaincode binary connected to the local dev peer. The default chaincode name is "registry"
- - deploy
-   Deploys the chaincode and returns to the shell
+    Additionally, there are several helper targets that make it easier to run the chaincode during development:
+**** dev
+    Start a peer in dev-mode, without security
+**** run
+    Launch the chaincode binary connected to the local dev peer. The default chaincode name is "registry"
+**** deploy
+    Deploys the chaincode and returns to the shell
 ** API
 *** Registry Chaincode
 #+begin_src proto3
