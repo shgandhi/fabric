@@ -16,43 +16,114 @@
 | [[https://github.com/bhauman/devcards][devcards]]   | Interactive demo and testing tool for cljs                       |
 | [[https://github.com/clojure-emacs/cider][cider]]      | Clojure Interactive Development Environment that Rocks for Emacs |
     
+** Tools
+   The repository includes a Makefile with the following targets:
+ - chaincode
+   Builds the chaincode in ~registry/~
+ - client
+   Builds the cljs client in ~registry/client~, and copies the necessary .proto files from the chaincode
+ - interface
+   Builds the java interface files used by the gateway
+
+   Additionally, there are several helper targets that make it easier to run the chaincode during development:
+ - dev
+   Start a peer in dev-mode, without security
+ - run
+   Launch the chaincode binary connected to the local dev peer. The default chaincode name is "registry"
+ - deploy
+   Deploys the chaincode and returns to the shell
 ** API
-*** Record
-    Current data model:
-    global owner, recordHash
-    list trials
-    list messages
-
-    Proposed data model:
-    recordHash -> (owner, trials, messages)
-
-    Could rotate owner / recordHash
-**** Functions
- #+begin_src proto3
-message EmptyParams {
+*** Registry Chaincode
+#+begin_src proto3
+message Item {
+         string data = 1;
 }
 
 message List {
-  repeated Item items = 1; 
+        repeated Item items = 1;
 }
 
-message Item {
-  string data = 1; 
+message Record {
+         string hash = 1;
+         string patient = 2;
+         List messages = 3;
+         List trials = 4;
 }
 
-AuthorizeTrial(Item)
-RevokeAuthorization(Item)
-SendMessage(Item)
-DeleteMessage(Item)
-Item GetRecord(EmptyParams)
-List GetMessages(EmptyParams)
-List GetAuthorizedTrials(EmptyParams)
+message Pair {
+         string key = 1;
+         string value = 2;
+}
+
+message EmptyParams {
+}
+
+Available RPC functions exported by this interface
+
+void AddTrial(Item) -> registry/txn/1 
+void RemoveTrial(Item) -> registry/txn/2 
+
+void AddRecord(Record) -> registry/txn/3 
+
+void AuthorizeTrial(Pair) -> registry/txn/4 
+void RevokeAuthorization(Pair) -> registry/txn/5 
+
+void SendMessage(Pair) -> registry/txn/6 
+void DeleteMessage(Pair) -> registry/txn/7 
+
+List GetTrialList(EmptyParams) -> registry/query/2 
+
+Item GetPatientKey(Item) -> registry/query/1 
+List GetMessages(Item) -> registry/query/3 
+List GetAuthorizedTrials(Item) -> registry/query/4 
 #+end_src
+*** cljs Registry client
+    There is an example REST client implemented in cljs included in the ~registry/client~ directory.
 
-*** TrialRegistry
-    Trial registry tracks the currently running trials, with the following information:
-    - Description of trial
-    - Hash id of the trial
+    Invoke from ~registry/client~ with: ~$ nodejs out/registry.js -n registry -c <command> -a <args>~
 
-      Seems redundant, we should probably just record a single list of active trials.
-      Could be merged with Record into a single master chaincode.
+    Examples:
+**** Add a trial
+#+begin_src shell
+nodejs out/registry.js -n registry -c add-trial -a '{"data": "TrialHash"}'
+#+end_src
+**** Remove a trial
+#+begin_src shell
+nodejs out/registry.js -n registry -c remove-trial -a '{"data": "TrialHash"}'
+#+end_src
+**** Add a record
+#+begin_src shell
+nodejs out/registry.js -n registry -c add-record -a '{"patient": "Pat", "hash": "RecordHash"}'
+#+end_src
+**** Authorize a trial
+#+begin_src shell
+nodejs out/registry.js -n registry -c authorize-trial -a '{"key": "RecordHash", "value": "TrialHash"}'
+#+end_src
+**** Revoke authorization
+#+begin_src shell
+nodejs out/registry.js -n registry -c revoke-authorization -a '{"key": "RecordHash", "value": "TrialHash"}'
+#+end_src
+**** Send message
+#+begin_src shell
+nodejs out/registry.js -n registry -c send-message -a '{"key": "RecordHash", "value": "Hello!"}'
+#+end_src
+**** Delete message
+#+begin_src shell
+nodejs out/registry.js -n registry -c delete-message -a '{"key": "RecordHash", "value": "Hello!"}'
+#+end_src
+**** Get list of trials
+#+begin_src shell
+nodejs out/registry.js -n registry -c get-trial-list
+#+end_src
+**** Get patient key
+#+begin_src shell
+nodejs out/registry.js -n registry -c get-patient-key -a '{"data": "RecordHash"}'
+#+end_src
+**** Get messages
+#+begin_src shell
+nodejs out/registry.js -n registry -c get-messages -a '{"data": "RecordHash"}'
+#+end_src
+**** Get authorized trials
+#+begin_src shell
+nodejs out/registry.js -n registry -c get-authorized-trials -a '{"data": "RecordHash"}'
+#+end_src
