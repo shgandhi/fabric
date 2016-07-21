@@ -16,6 +16,7 @@
                  [yogthos/config "0.8"]
                  [selmer "0.9.1"]
                  [json-html "0.2.3"]
+                 [cljs-ajax "0.5.3"]
                  [org.clojars.frozenlock/reagent-modals "0.2.3"]
                  [org.clojure/clojurescript "1.9.93"
                   :scope "provided"]
