@@ -38,6 +38,6 @@
   (wrap-reload #'app))
 
 (defn run []
-  (figwheel/start-figwheel!))
+  (figwheel/start-figwheel! "app" "devcards"))
 
 (def browser-repl figwheel/cljs-repl)

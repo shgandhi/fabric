@@ -4,7 +4,8 @@
             [hiccup.page :refer [include-js include-css html5]]
             [gateway.middleware :refer [wrap-middleware]]
             [selmer.parser :as parser]
-            [config.core :refer [env]]))
+            [config.core :refer [env]]
+            [gateway.registry]))
 
 (def mount-target
   [:div#app
@@ -50,9 +51,7 @@
      (parser/render-file "templates/app.html"
                         {:forms-css (resource "reagent-forms.css")
                          :json-css (resource "json.human.css")}))
-  ;;(GET "/about" [] loading-page)
-  ;;(GET "/cards" [] cards-page)
-  ;;(GET "/test" [] test-page)  
+  (GET "/cards" [] cards-page)
   (resources "/")
   (not-found "Not Found"))
 

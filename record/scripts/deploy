@@ -1,5 +1,0 @@
-#!/bin/sh
-function='"Function":"init"'
-data='{"OwnerPubKey":'$1', "RecordHash":'$2'}'
-args='"Args": ["'$(echo $data | base64)'"]'
-echo peer chaincode deploy -n record -c "{$function, $args}"
