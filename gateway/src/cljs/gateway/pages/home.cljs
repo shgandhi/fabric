@@ -85,4 +85,4 @@
               [:hr]
             [:div.login-footer
               [:button.btn.btn-primary {:type "submit"
-                        :on-click #(dispatch! "/patient-actions")} "Login"]]]]])))
+                        :on-click #(dispatch! "/patient-page")} "Login"]]]]])))

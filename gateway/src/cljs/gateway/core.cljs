@@ -21,7 +21,11 @@
               [gateway.pages.clinic_actions.retrieve :refer [retrieve]]
               [gateway.pages.clinic_actions.upload_msg :refer [upload_msg]]
               [gateway.pages.clinic_actions.notify :refer [notify]]
-              [gateway.pages.patient :refer [patient-actions]])
+              [gateway.pages.patient :refer [patient-page]]
+              [gateway.components.patient_sidebar :refer [patient_sidebar]]
+              [gateway.pages.patient_actions.read_trial :refer [read_trial]]
+              [gateway.pages.patient_actions.authorize_trial :refer [authorize_trial]]
+              [gateway.pages.patient_actions.revoke_trial :refer [revoke_trial]])
     (:import goog.History))
 
 (defn current-page []
@@ -33,8 +37,17 @@
 (secretary/defroute "/" []
   (session/put! :current-page #'home-page))
 
-(secretary/defroute "/patient-actions" []
-  (session/put! :current-page #'patient-actions))
+(secretary/defroute "/patient-page" []
+  (session/put! :current-page #'patient-page))
+
+(secretary/defroute "/read_trial" []
+  (session/put! :current-page #'read_trial))
+
+(secretary/defroute "/authorize_trial" []
+  (session/put! :current-page #'authorize_trial))
+
+(secretary/defroute "/revoke_trial" []
+  (session/put! :current-page #'revoke_trial))
 
 (secretary/defroute "/clinic-page" []
   (session/put! :current-page #'clinic-page))

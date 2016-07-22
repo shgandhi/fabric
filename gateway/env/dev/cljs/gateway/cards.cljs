@@ -26,6 +26,7 @@
   (testing "has-number?"
     (is (= (has-number? ["a" 32]) true) "Collection contains a number")))
 
+
 (reagent/render [:div] (.getElementById js/document "app"))
 
 ;; remember to run 'lein figwheel devcards' and then browse to

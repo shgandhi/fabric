@@ -1,10 +1,10 @@
-(ns gateway.pages.patient
+(ns gateway.pages.patient_actions.authorize_trial
     (:require [json-html.core :refer [edn->hiccup]]
               [reagent.core :as reagent :refer [atom]]
               [reagent-forms.core :refer [bind-fields init-field value-of]]
               [reagent.session :as session]
-              [gateway.components.patient_sidebar :refer [patient_sidebar]]
-              [reagent-modals.modals :as reagent-modals]))
+              [reagent-modals.modals :as reagent-modals]
+              [gateway.components.patient_sidebar :refer [patient_sidebar]]))
 
 ;;-------------------------
 ;; Helpers
@@ -53,37 +53,21 @@
                     [prompt-message "Enter the Clinic Public Key for the Clinic to authorize/revoke"]
                     true))
 
-(defn read-trial-input
-  [trial-atom]
-  (input-and-prompt "Trial Description Hash"
-                    :text
-                    :trial.hash
-                    trial-atom
-                    [prompt-message ""]
-                    false))
-
 ;; -------------------------
 ;; Views
 
-(defn patient-page []
-  [:div.container-fluid
-    [:div#wrapper
-      [patient_sidebar]
-        [:div.row.placeholders
-            [:div.col-xs-6.col-sm-3.placeholder
-              [:a {:href "#/read_trial"} [:img.img-responsive {:src "data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==", :width "200", :height "200"}
-              ]]
-              [:h4 "View Trials"][:br]
-              [:span.text-muted "View Specific Trial"][:hr]
-              [:span.text-muted "View All Trials"][:hr]
-            ]
-            [:div.col-xs-6.col-sm-3.placeholder
-              [:a {:href "#/authorize_trial"} [:img.img-responsive {:src "data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==", :width "200", :height "200"}]]
-              [:h4 "Authorize Trial"][:br]
-              [:span.text-muted "Authorize Trial"]
-            ]
-            [:div.col-xs-6.col-sm-3.placeholder
-              [:a {:href "#/revoke_trial"} [:img.img-responsive {:src "data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==", :width "200", :height "200"}]]
-              [:h4 "Revoke Trial"][:br]
-              [:span.text-muted "Revoke Trial"]
-            ]]]])
+(defn authorize_trial []
+  (let [trial-pub-key (atom nil)]
+    (fn []
+      [:div.container-fluid
+        [:div#wrapper
+          [patient_sidebar]
+          [:div.container-fluid.dashboard-content 
+            [:div.panel.panel-default
+              [:div.dashboard-content-title [:h1 "Authorize Trial on your EHR"]][:hr]
+                [:div.dashboard-content-body
+                  [:form [trial-pubkey-input trial-pub-key]]]
+                  [:hr]
+                [:div.dashboard-content-footer
+                  [:button.btn.btn-primary 
+                    [:a {:href "#"} "Authorize"]]]]]]])))
