@@ -127,3 +127,16 @@ nodejs out/registry.js -n registry -c get-messages -a '{"data": "RecordHash"}'
 #+begin_src shell
 nodejs out/registry.js -n registry -c get-authorized-trials -a '{"data": "RecordHash"}'
 #+end_src
+** Todo
+*** Gateway
+**** General
+     - [ ] Make devcards for components
+     - [ ] Split common elements into shared
+     - [ ] Reduce components to contain minimal markup
+**** Clinic
+     - [ ] Integrate registry
+     - [ ] IPFS
+       - [ ] UI for IPFS add
+**** Patient
+     - [ ] Switch from modal view to sidebar
+     - [ ] Integrate registry

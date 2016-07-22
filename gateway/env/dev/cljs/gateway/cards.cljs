@@ -3,6 +3,8 @@
             [reagent.session :as session]
             [gateway.core :as core]
             [gateway.util :as util]
+            [gateway.pages.patient :as patient]
+            [gateway.pages.home :as home]
             )
   (:require-macros
    [devcards.core
@@ -13,25 +15,16 @@
 
 (defcard "# Devcards for trial-chain")
 
-#_(defcard-rg home-page-card
-  [core/home-page])
+(defcard-rg hash-input-card
+  [home/hash-input (atom nil)])
 
-#_(defcard-rg trial-hash-card
-  [core/trial-hash-window])
-
-(defcard-rg sidebar-card
-  [core/sidebar])
-
-#_(defcard-rg patient-actions-card
-  [core/patient-actions "test"])
-
-(defcard-rg util-card
-  [util/foo-cljc "test"])
+(defn has-number? [s]
+  (some number? s))
 
 ;this is how you do a unit-test card
 (deftest test-card
   (testing "has-number?"
-    (is (= (core/has-number? "32") true) "32 is a number")))
+    (is (= (has-number? ["a" 32]) true) "Collection contains a number")))
 
 (reagent/render [:div] (.getElementById js/document "app"))
 
