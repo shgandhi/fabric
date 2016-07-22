@@ -26,9 +26,10 @@
 
                  [org.clojure/data.codec "0.1.0"]
                  [org.clojars.ghaskins/protobuf "0.3"]
-                 [clj-http "3.1.0"]
+                 [http-kit "2.1.18"]
                  [cheshire "5.6.3"]
                  [slingshot "0.12.2"]
+                 [clj-ipfs-api "1.2.1"]
                  ]
   
   :plugins [[lein-environ "1.0.2"]

@@ -1,9 +1,9 @@
 (ns gateway.server
   (:require [gateway.handler :refer [app]]
             [config.core :refer [env]]
-            [ring.adapter.jetty :refer [run-jetty]])
+            [org.httpkit.server :as http])
   (:gen-class))
 
  (defn -main [& args]
    (let [port (Integer/parseInt (or (env :port) "3000"))]
-     (run-jetty app {:port port :join? false})))
+     (http/run-server app {:port port :join? false})))

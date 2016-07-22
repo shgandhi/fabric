@@ -7,7 +7,7 @@
             Interface$EmptyParams
             ])
   (:require [clojure.java.io :as io]
-            [clj-http.client :as http]
+            [org.httpkit.client :as http]
             [flatland.protobuf.core :as fl]
             [clojure.data.codec.base64 :as base64]
             [cheshire.core :as json]
@@ -59,10 +59,9 @@
                        :ctorMsg {:function func
                                  :args [(encode args)]}}
               :id "1"}]
-    (http/post (url options)
-               {:content-type :json
-                :accept :json
-                :form-params body})))
+    (prn options)
+    @(http/post (url options)
+               {:body (json/encode body)})))
 
 ;;-----------------------------------------------------------------------------
 ;; invokes a "query" operation on top of (post) and evaluates to a successful response
